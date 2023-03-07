@@ -7,12 +7,11 @@ else
   filter="matano"
 fi
 
-
 for b in `aws s3 ls | grep $filter | cut -d" " -f3`
 do
   echo "==== $b ===="
   [[ -d $b ]] || mkdir $b
-  aws s3 sync s3://$b $b
+  aws s3 sync s3://$b $b --exclude "*" --include "*.parquet"
   echo
   sleep 2
 done
