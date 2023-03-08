@@ -24,8 +24,9 @@ user_agent = {'device': NULL, 'name': NULL, 'original': aws-sdk-java/2.17.131 Li
 
 ```
 
-# User Identity 
+# User information
 
+## Identity 
 
 ```
 D select distinct (aws.cloudtrail.user_identity.type) from aws_cloudtrail;
@@ -55,9 +56,59 @@ D select aws.cloudtrail.user_identity.type, count(*) as cnt from aws_cloudtrail 
 └─────────────┴───────┘
 ```
 
+Let's investigate Root access by combining with `user_agent`
 
-# User Agents
+```
+D select distinct (source.ip,user_agent.original) from aws_cloudtrail where aws.cloudtrail.user_identity.type == 'Root';
+main.row(source.ip, user_agent.original) = {'v1': 173.67.45.221, 'v2': AWS Internal}
+
+main.row(source.ip, user_agent.original) = {'v1': 173.67.45.221, 'v2': aws-internal/3 aws-sdk-java/1.12.414 Linux/5.10.165-126.735.amzn2int.x86_64 OpenJDK_64-Bit_Server_VM/25.362-b10 java/1.8.0_362 vendor/Oracle_Corporation cfg/retry-mode/standard}
+
+main.row(source.ip, user_agent.original) = {'v1': NULL, 'v2': AWS Internal}
+
+main.row(source.ip, user_agent.original) = {'v1': 173.67.45.221, 'v2': Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36}
+```
+
 
 ```
 select distinct (user_agent.original, source.address) from aws_cloudtrail;
 ```
+
+##
+
+
+# Event Types
+
+```
+D select distinct (event.provider, cloud.region) from aws_cloudtrail order by cloud.region;
+┌───────────────────────────────────────────────────────────────────┐
+│             main.row("event".provider, cloud.region)              │
+│                  struct(v1 varchar, v2 varchar)                   │
+├───────────────────────────────────────────────────────────────────┤
+│ {'v1': glue.amazonaws.com, 'v2': us-east-1}                       │
+│ {'v1': s3.amazonaws.com, 'v2': us-east-1}                         │
+│ {'v1': sts.amazonaws.com, 'v2': us-east-1}                        │
+│ {'v1': kms.amazonaws.com, 'v2': us-east-1}                        │
+│ {'v1': logs.amazonaws.com, 'v2': us-east-1}                       │
+│ {'v1': states.amazonaws.com, 'v2': us-east-1}                     │
+│ {'v1': athena.amazonaws.com, 'v2': us-east-1}                     │
+│ {'v1': health.amazonaws.com, 'v2': us-east-1}                     │
+│ {'v1': iam.amazonaws.com, 'v2': us-east-1}                        │
+│ {'v1': ec2.amazonaws.com, 'v2': us-east-1}                        │
+│ {'v1': ram.amazonaws.com, 'v2': us-east-1}                        │
+│ {'v1': ce.amazonaws.com, 'v2': us-east-1}                         │
+│ {'v1': organizations.amazonaws.com, 'v2': us-east-1}              │
+│ {'v1': securityhub.amazonaws.com, 'v2': us-east-1}                │
+│ {'v1': signin.amazonaws.com, 'v2': us-east-1}                     │
+│ {'v1': servicecatalog-appregistry.amazonaws.com, 'v2': us-east-1} │
+│ {'v1': access-analyzer.amazonaws.com, 'v2': us-east-1}            │
+│ {'v1': inspector.amazonaws.com, 'v2': us-east-1}                  │
+│ {'v1': sts.amazonaws.com, 'v2': us-west-1}                        │
+│ {'v1': ec2.amazonaws.com, 'v2': us-west-1}                        │
+├───────────────────────────────────────────────────────────────────┤
+│                              20 rows                              │
+└───────────────────────────────────────────────────────────────────┘
+```
+
+
+
