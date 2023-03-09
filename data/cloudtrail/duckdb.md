@@ -110,5 +110,81 @@ D select distinct (event.provider, cloud.region) from aws_cloudtrail order by cl
 └───────────────────────────────────────────────────────────────────┘
 ```
 
+## Outcomes 
+
+```
+D select  count(*) as cnt, event.outcome from  aws_cloudtrail group by event.outcome;
+┌───────┬─────────┐
+│  cnt  │ outcome │
+│ int64 │ varchar │
+├───────┼─────────┤
+│ 57159 │ success │
+│   309 │ failure │
+└───────┴─────────┘
+```
+
+Let's see the failures
+
+```
+D select event.provider, count(*) as cnt from aws_cloudtrail where event.outcome = 'failure' group by event.provider order by cnt desc;
+┌───────────────────────────┬───────┐
+│         provider          │  cnt  │
+│          varchar          │ int64 │
+├───────────────────────────┼───────┤
+│ athena.amazonaws.com      │   251 │
+│ glue.amazonaws.com        │    46 │
+│ inspector.amazonaws.com   │     6 │
+│ s3.amazonaws.com          │     2 │
+│ securityhub.amazonaws.com │     2 │
+│ logs.amazonaws.com        │     2 │
+└───────────────────────────┴───────┘
+```
+
+What error codes are there for these failures?
+
+```
+D select distinct ( aws.cloudtrail.error_code, event.provider)  from aws_cloudtrail where event.outcome = 'failure';;
+┌───────────────────────────────────────────────────────────────────┐
+│       main.row(aws.cloudtrail.error_code, "event".provider)       │
+│                  struct(v1 varchar, v2 varchar)                   │
+├───────────────────────────────────────────────────────────────────┤
+│ {'v1': AccessDenied, 'v2': athena.amazonaws.com}                  │
+│ {'v1': NoSuchBucket, 'v2': s3.amazonaws.com}                      │
+│ {'v1': InvalidRequestException, 'v2': athena.amazonaws.com}       │
+│ {'v1': EntityNotFoundException, 'v2': glue.amazonaws.com}         │
+│ {'v1': InvalidAccessException, 'v2': securityhub.amazonaws.com}   │
+│ {'v1': NoSuchEntityException, 'v2': inspector.amazonaws.com}      │
+│ {'v1': ConcurrentModificationException, 'v2': glue.amazonaws.com} │
+│ {'v1': ResourceAlreadyExistsException, 'v2': logs.amazonaws.com}  │
+└───────────────────────────────────────────────────────────────────┘
+```
+
+Which user failed to access S3?
+
+```
+D select aws_cloudtrail.user.name, event.action, ts,source.address from aws_cloudtrail where event.outcome = 'failure' and event.provider = 's3.amazonaws.com';
+┌─────────┬───────────────────┬─────────────────────┬──────────────────────┐
+│  name   │      action       │         ts          │       address        │
+│ varchar │      varchar      │      timestamp      │       varchar        │
+├─────────┼───────────────────┼─────────────────────┼──────────────────────┤
+│ asus    │ GetBucketLocation │ 2023-03-08 01:26:00 │ athena.amazonaws.com │
+│ asus    │ GetBucketLocation │ 2023-03-08 01:26:00 │ athena.amazonaws.com │
+└─────────┴───────────────────┴─────────────────────┴──────────────────────┘
+```
+
+Find Non-AWS User agents 
+
+```
+D select distinct (user_agent.original, source.address) from aws_cloudtrail where event.outcome = 'failure' and user_agent.original NOT LIKE '%amazonaws.com';
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                                main.row(user_agent.original, source.address)                                                 │
+│                                                        struct(v1 varchar, v2 varchar)                                                        │
+├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ {'v1': Boto3/1.26.27 Python/3.9.2 Linux/5.10.159-20950-g3963226d9eb4 Botocore/1.29.27, 'v2': 173.67.45.221}                                  │
+│ {'v1': Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36, 'v2': 173.67.45.221} │
+│ {'v1': awslambda-worker/1.0 rusoto/0.48.0 rust/1.66.0 linux, 'v2': 3.236.107.97}                                                             │
+│ {'v1': Boto3/1.26.69 Python/3.10.6 Linux/5.15.0-60-generic Botocore/1.29.69, 'v2': 173.67.45.221}                                            │
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+```
 
 
