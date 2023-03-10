@@ -3,7 +3,7 @@
 The best way is to set `.mode line` to be able to see fields vertically
 
 ```
-D select * from aws_cloudtrail limit 2;
+select * from aws_cloudtrail limit 2;
         ts = 2023-03-07 19:11:30
        aws = {'cloudtrail': {'event_version': 1.08, 'user_identity': {'type': AssumedRole, 'arn': arn:aws:sts::XXXXX3:assumed-role/MatanoDPMainStack-IcebergMetadataWriterFunctionSer-1LW39UZEYJKXX/MatanoDPMainStack-IcebergMetadataWriterFunctionC5F-CQ94l7hRz9pI, 'access_key_id': ASIAXX, 'session_context': {'mfa_authenticated': false, 'creation_date': 2023-03-07 19:11:14, 'session_issuer': {'type': Role, 'principal_id': AROAXXXW, 'arn': arn:aws:iam::XXXXXX:role/MatanoDPMainStack-IcebergMetadataWriterFunctionSer-1LW39UZEYJKXX, 'account_id': XXXXXX}}, 'invoked_by': NULL}, 'error_code': NULL, 'error_message': NULL, 'request_parameters': NULL, 'response_elements': NULL, 'additional_eventdata': NULL, 'request_id': c9b63139-ded8-43e5-9450-45e99426cf58, 'event_type': AwsApiCall, 'api_version': NULL, 'management_event': true, 'read_only': true, 'resources': NULL, 'recipient_account_id': XXXXXX3, 'service_event_details': NULL, 'shared_event_id': NULL, 'vpc_endpoint_id': NULL, 'event_category': Management, 'console_login': NULL, 'flattened': {'additional_eventdata': {"insufficientLakeFormationPermissions":["matano:aws_cloudtrail"],"lakeFormationPrincipal":"arn:aws:iam::XXXXXXXX:role/MatanoDPMainStack-IcebergMetadataWriterFunctionSer-1LW39UZEYJKXX"}, 'request_parameters': {"databaseName":"matano","name":"aws_cloudtrail"}, 'response_elements': NULL, 'service_event_details': NULL}}}
     labels =
@@ -29,7 +29,7 @@ user_agent = {'device': NULL, 'name': NULL, 'original': aws-sdk-java/2.17.131 Li
 ## Identity 
 
 ```
-D select distinct (aws.cloudtrail.user_identity.type) from aws_cloudtrail;
+select distinct (aws.cloudtrail.user_identity.type) from aws_cloudtrail;
 ┌─────────────┐
 │    type     │
 │   varchar   │
@@ -44,7 +44,7 @@ D select distinct (aws.cloudtrail.user_identity.type) from aws_cloudtrail;
 Now let's count
 
 ```
-D select aws.cloudtrail.user_identity.type, count(*) as cnt from aws_cloudtrail group by aws.cloudtrail.user_identity.type order by cnt desc;
+select aws.cloudtrail.user_identity.type, count(*) as cnt from aws_cloudtrail group by aws.cloudtrail.user_identity.type order by cnt desc;
 ┌─────────────┬───────┐
 │    type     │  cnt  │
 │   varchar   │ int64 │
@@ -59,7 +59,7 @@ D select aws.cloudtrail.user_identity.type, count(*) as cnt from aws_cloudtrail 
 Let's investigate Root access by combining with `user_agent`
 
 ```
-D select distinct (source.ip,user_agent.original) from aws_cloudtrail where aws.cloudtrail.user_identity.type == 'Root';
+select distinct (source.ip,user_agent.original) from aws_cloudtrail where aws.cloudtrail.user_identity.type == 'Root';
 main.row(source.ip, user_agent.original) = {'v1': 173.67.45.221, 'v2': AWS Internal}
 
 main.row(source.ip, user_agent.original) = {'v1': 173.67.45.221, 'v2': aws-internal/3 aws-sdk-java/1.12.414 Linux/5.10.165-126.735.amzn2int.x86_64 OpenJDK_64-Bit_Server_VM/25.362-b10 java/1.8.0_362 vendor/Oracle_Corporation cfg/retry-mode/standard}
@@ -80,7 +80,7 @@ select distinct (user_agent.original, source.address) from aws_cloudtrail;
 # Event Types
 
 ```
-D select distinct (event.provider, cloud.region) from aws_cloudtrail order by cloud.region;
+select distinct (event.provider, cloud.region) from aws_cloudtrail order by cloud.region;
 ┌───────────────────────────────────────────────────────────────────┐
 │             main.row("event".provider, cloud.region)              │
 │                  struct(v1 varchar, v2 varchar)                   │
@@ -113,7 +113,7 @@ D select distinct (event.provider, cloud.region) from aws_cloudtrail order by cl
 ## Outcomes 
 
 ```
-D select  count(*) as cnt, event.outcome from  aws_cloudtrail group by event.outcome;
+select  count(*) as cnt, event.outcome from  aws_cloudtrail group by event.outcome;
 ┌───────┬─────────┐
 │  cnt  │ outcome │
 │ int64 │ varchar │
@@ -126,7 +126,7 @@ D select  count(*) as cnt, event.outcome from  aws_cloudtrail group by event.out
 Let's see the failures
 
 ```
-D select event.provider, count(*) as cnt from aws_cloudtrail where event.outcome = 'failure' group by event.provider order by cnt desc;
+select event.provider, count(*) as cnt from aws_cloudtrail where event.outcome = 'failure' group by event.provider order by cnt desc;
 ┌───────────────────────────┬───────┐
 │         provider          │  cnt  │
 │          varchar          │ int64 │
@@ -143,7 +143,7 @@ D select event.provider, count(*) as cnt from aws_cloudtrail where event.outcome
 What error codes are there for these failures?
 
 ```
-D select distinct ( aws.cloudtrail.error_code, event.provider)  from aws_cloudtrail where event.outcome = 'failure';;
+select distinct ( aws.cloudtrail.error_code, event.provider)  from aws_cloudtrail where event.outcome = 'failure';;
 ┌───────────────────────────────────────────────────────────────────┐
 │       main.row(aws.cloudtrail.error_code, "event".provider)       │
 │                  struct(v1 varchar, v2 varchar)                   │
@@ -162,7 +162,7 @@ D select distinct ( aws.cloudtrail.error_code, event.provider)  from aws_cloudtr
 Which user failed to access S3?
 
 ```
-D select aws_cloudtrail.user.name, event.action, ts,source.address from aws_cloudtrail where event.outcome = 'failure' and event.provider = 's3.amazonaws.com';
+select aws_cloudtrail.user.name, event.action, ts,source.address from aws_cloudtrail where event.outcome = 'failure' and event.provider = 's3.amazonaws.com';
 ┌─────────┬───────────────────┬─────────────────────┬──────────────────────┐
 │  name   │      action       │         ts          │       address        │
 │ varchar │      varchar      │      timestamp      │       varchar        │
@@ -175,7 +175,7 @@ D select aws_cloudtrail.user.name, event.action, ts,source.address from aws_clou
 Find Non-AWS User agents 
 
 ```
-D select distinct (user_agent.original, source.address) from aws_cloudtrail where event.outcome = 'failure' and user_agent.original NOT LIKE '%amazonaws.com';
+select distinct (user_agent.original, source.address) from aws_cloudtrail where event.outcome = 'failure' and user_agent.original NOT LIKE '%amazonaws.com';
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 │                                                main.row(user_agent.original, source.address)                                                 │
 │                                                        struct(v1 varchar, v2 varchar)                                                        │
