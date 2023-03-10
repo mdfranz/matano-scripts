@@ -79,6 +79,28 @@ select distinct (user_agent.original, source.address) from aws_cloudtrail;
 
 # Event Types
 
+## Type
+
+```
+select event.type, count(*) as cnt from aws_cloudtrail group by event.type;
+┌───────────────────┬────────┐
+│       type        │  cnt   │
+│     varchar[]     │ int64  │
+├───────────────────┼────────┤
+│ [info]            │ 423557 │
+│ [creation]        │     14 │
+│ [user, info]      │     93 │
+│ [group, info]     │     17 │
+│ [user, change]    │     10 │
+│ [admin, creation] │      1 │
+│ [user, creation]  │      2 │
+└───────────────────┴────────┘
+```
+
+
+
+
+## Provider
 ```
 select distinct (event.provider, cloud.region) from aws_cloudtrail order by cloud.region;
 ┌───────────────────────────────────────────────────────────────────┐
