@@ -172,19 +172,85 @@ main.row(source.ip, user_agent.original) = {'v1': NULL, 'v2': AWS Internal}
 main.row(source.ip, user_agent.original) = {'v1': 173.67.45.221, 'v2': Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36}
 ```
 
-
-```
-select distinct (user_agent.original, source.address) from aws_cloudtrail;
-```
-
 # Event Categorization Fields
 
-Matano's CloudTrail [categorization fields](https://www.elastic.co/guide/en/ecs/current/ecs-category-field-values-reference.html) fields are useful and include:
+[ECS Categorization](https://www.elastic.co/guide/en/ecs/current/ecs-category-field-values-reference.html) fields are useful and include:
 
-* event.type
-* event.action
-* event.outcome
-* event.provider - 
+* event.type 
+* event.action 
+* event.outcome 
+* event.provider
+
+## Action
+
+Often the most infrequent actions are the most useful
+
+```
+select event.action, count(*) as cnt from aws_cloudtrail group by event.action order by cnt limit 10;
+
+┌───────────────────────────────┬───────┐
+│            action             │  cnt  │
+│            varchar            │ int64 │
+├───────────────────────────────┼───────┤
+│ CreateKeyPair                 │     1 │
+│ AuthorizeSecurityGroupIngress │     1 │
+│ DescribeCoipPools             │     1 │
+│ DescribePublicIpv4Pools       │     1 │
+│ AllocateAddress               │     1 │
+│ AssociateAddress              │     1 │
+│ ListRolePolicies              │     1 │
+│ CreateInstanceProfile         │     1 │
+│ AddRoleToInstanceProfile      │     1 │
+│ CreateSecurityGroup           │     1 │
+├───────────────────────────────┴───────┤
+│ 10 rows                     2 columns │
+└───────────────────────────────────────┘
+```
+
+## Outcome
+
+These are either success or failure 
+
+```
+select distinct event.provider, event.action from aws_cloudtrail where event.outcome = 'failure' order by event.provider;
+┌──────────────────────────────┬──────────────────────────────────┐
+│           provider           │              action              │
+│           varchar            │             varchar              │
+├──────────────────────────────┼──────────────────────────────────┤
+│ athena.amazonaws.com         │ StopQueryExecution               │
+│ athena.amazonaws.com         │ GetQueryResults                  │
+│ athena.amazonaws.com         │ StartQueryExecution              │
+│ athena.amazonaws.com         │ GetWorkGroup                     │
+│ cloudformation.amazonaws.com │ DescribeStacks                   │
+│ dynamodb.amazonaws.com       │ DescribeTable                    │
+│ ec2.amazonaws.com            │ DescribeSecurityGroupRules       │
+│ glue.amazonaws.com           │ GetTable                         │
+│ glue.amazonaws.com           │ UpdateTable                      │
+│ glue.amazonaws.com           │ BatchGetTable                    │
+│ iam.amazonaws.com            │ GetRolePolicy                    │
+│ iam.amazonaws.com            │ GetAccountPasswordPolicy         │
+│ inspector.amazonaws.com      │ StartAssessmentRun               │
+│ lambda.amazonaws.com         │ GetEventSourceMapping20150331    │
+│ logs.amazonaws.com           │ CreateLogStream                  │
+│ logs.amazonaws.com           │ StartQuery                       │
+│ organizations.amazonaws.com  │ ListDelegatedAdministrators      │
+│ s3.amazonaws.com             │ GetBucketPolicy                  │
+│ s3.amazonaws.com             │ GetBucketPolicyStatus            │
+│ s3.amazonaws.com             │ GetAccountPublicAccessBlock      │
+│ s3.amazonaws.com             │ GetBucketOwnershipControls       │
+│ s3.amazonaws.com             │ ListBuckets                      │
+│ s3.amazonaws.com             │ GetBucketWebsite                 │
+│ s3.amazonaws.com             │ GetBucketObjectLockConfiguration │
+│ s3.amazonaws.com             │ GetBucketTagging                 │
+│ s3.amazonaws.com             │ GetBucketEncryption              │
+│ s3.amazonaws.com             │ GetBucketLocation                │
+│ s3.amazonaws.com             │ GetBucketPublicAccessBlock       │
+│ securityhub.amazonaws.com    │ DescribeHub                      │
+│ sns.amazonaws.com            │ GetTopicAttributes               │
+├──────────────────────────────┴──────────────────────────────────┤
+│ 30 rows                                               2 columns │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 
 ## Type
