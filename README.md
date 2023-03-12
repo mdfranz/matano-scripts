@@ -1,11 +1,5 @@
 # matano-scripts
 
+Here are some scripts (and documentation of queries) for working with https://matano.dev
 
 
-
-# Useful SQL Queries
-
-```
-SELECT source_address, count(*) as count FROM "matano"."matano_alerts_view"
-group by source_address 
-```
