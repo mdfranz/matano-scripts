@@ -1,7 +1,6 @@
 # A First Look at the Data
 
-Matano creates [https://www.elastic.co/guide/en/ecs/current/index.html](ECS) records based a [https://github.com/matanolabs/matano/blob/main/data/managed/log_sources/aws_cloudtrail/log_source.yml](VRL Transform) that results in events like this when loaded into DuckDB from Parquet files with:
-
+Matano creates [ECS](https://www.elastic.co/guide/en/ecs/current/index.html) records based a [VRL Transforms](https://github.com/matanolabs/matano/blob/main/data/managed/log_sources/aws_cloudtrail/log_source.yml) that results in events like this when loaded into DuckDB from Parquet files with:
 
 ```
 create table aws_cloudtrail as select * from "*.parquet";
@@ -31,7 +30,7 @@ user_agent = {'device': NULL, 'name': NULL, 'original': aws-sdk-java/2.17.131 Li
 
 NOTE: The best way is to set `.mode line` to be able to see fields vertically
 
-Also [https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html](AWS CloudTrail Reference)
+See [CloudTrail Field Reference](https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html)
 
 
 # Timestamp
