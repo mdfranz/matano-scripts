@@ -179,7 +179,7 @@ select distinct (user_agent.original, source.address) from aws_cloudtrail;
 
 # Event Categorization Fields
 
-Matano's CloudTrail [https://www.elastic.co/guide/en/ecs/current/ecs-category-field-values-reference.html](categorization) fields are useful and include:
+Matano's CloudTrail [categorization fields](https://www.elastic.co/guide/en/ecs/current/ecs-category-field-values-reference.html) fields are useful and include:
 
 * event.type
 * event.action
