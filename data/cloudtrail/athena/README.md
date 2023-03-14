@@ -8,6 +8,13 @@ See [presto SQL syntax](https://prestodb.io/docs/current/sql.html) and [function
 athena --profile foo --region us-east-1 --workgroup matano_default --db matano_cloudtrail_view
 ```
 
+Dump CSV to file
+
+```
+athena --profile mdfranz --region us-east-1 --workgroup matano_default --db matano_cloudtrail_view --output-format TSV_HEADER --execute "SELECT
+(ts,cloud_region, aws_cloudtrail_user_identity_access_key_id, aws_cloudtrail_event_type,  event_outcome, event_provider, source_address) FROM matano.aws_cloudtrail_view" | tr -d '{}' > ~/cloudtrail-mdfranz.csv
+```
+
 To do a vertical dump, removing NULL fields
 
 ```
@@ -39,8 +46,28 @@ $ athena --region us-east-1 --workgroup matano_default --db matano_cloudtrail_vi
  user_agent_original                                                      | inspector2.amazonaws.com
 ```
 
-
 # Timestamp
+
+`NOTE` - see [presto date/time operations](https://prestodb.io/docs/current/functions/datetime.html)
+
+Get first and last event
+
+```
+select min(ts), max(ts) from matano.aws_cloudtrail_view;
+ _col0                   | _col1
+-------------------------+-------------------------
+ 2023-02-11 21:19:08.000 | 2023-03-14 00:32:17.000
+ ```
+
+Find first event 24 hours ago
+
+```
+SELECT min(ts) FROM matano.aws_cloudtrail_view where ts > current_timestamp - interval '24' hour;
+ _col0
+-------------------------
+ 2023-03-13 12:24:53.000
+(1 rows)
+```
 
 
 # Cloud
