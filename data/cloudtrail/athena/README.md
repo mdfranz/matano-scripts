@@ -2,6 +2,8 @@
 
 Interactive connection with [athena-cli](https://pypi.org/project/athena-cli/)
 
+See [presto SQL syntax](https://prestodb.io/docs/current/sql.html) and [functions/operators](https://prestodb.io/docs/current/functions.html)
+
 ```
 athena --profile foo --region us-east-1 --workgroup matano_default --db matano_cloudtrail_view
 ```
