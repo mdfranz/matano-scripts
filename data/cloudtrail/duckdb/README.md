@@ -28,7 +28,7 @@ select * from aws_cloudtrail limit 2;
 user_agent = {'device': NULL, 'name': NULL, 'original': aws-sdk-java/2.17.131 Linux/4.14.255-301-238.520.amzn2.x86_64 OpenJDK_64-Bit_Server_VM/11.0.14.1+10-LTS Java/11.0.14.1 kotlin vendor/Amazon.com_Inc. exec-env/AWS_Lambda_java11 io/sync http/UrlConnection cfg/retry-mode/legacy, 'os': NULL, 'version': NULL}
 ```
 
-NOTE: The best way is to set `.mode line` to be able to see fields vertically
+NOTE: The best way is to set `.mode line` to be able to see fields vertically to get the display above, then you and switch back to `.mode d` to see the default output. 
 
 See [CloudTrail Field Reference](https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html)
 
