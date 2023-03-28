@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-# Remove all the buckets that start with matano in the region specified
-
 import boto3,sys
 DEBUG=False
 
@@ -14,9 +12,7 @@ if __name__ == "__main__":
         if sys.argv[2] == 'debug':
             DEBUG = True
    
-    bucket_region = sys.argv[1]
-    
-    s3 = boto3.resource('s3',region_name=bucket_region)
+    s3 = boto3.resource('s3',region_name=sys.argv[1])
     
     for b in s3.buckets.all():
         if b.name.startswith('matano'):    
