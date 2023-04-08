@@ -11,7 +11,7 @@ q['aws_svc_cnt'] = """select source.address, count(*) as cnt from aws_cloudtrail
 q['infreq_events'] = """select event.action, count(*) as cnt from aws_cloudtrail 
 group by event.action order by cnt limit 15;"""
 
-db.execute('set threads to 4')
+db.execute('set threads to 3')
 
 if "view" not in sys.argv:
   db.execute('create table aws_cloudtrail as select * from "*.parquet"')
