@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 
-import psutil,humanize
+import psutil,humanize,platform
 import pandas as pd
 from pathlib import Path                           
+
+print ("Pandas version:",pd.__version__)
+print ("Platform:",platform.machine(),platform.python_version())
+
 
 data_dir=Path(".")                          
 

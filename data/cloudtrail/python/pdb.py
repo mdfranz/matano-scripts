@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 
-import duckdb,humanize
-import sys,psutil
+import duckdb
+import sys,psutil,platform,humanize
+
+print ("DuckDB Version",duckdb.__version__)
+print ("Platform:",platform.machine(),platform.python_version())
+
 
 db = duckdb.connect()
 
@@ -11,7 +15,7 @@ q['aws_svc_cnt'] = """select source.address, count(*) as cnt from aws_cloudtrail
 q['infreq_events'] = """select event.action, count(*) as cnt from aws_cloudtrail 
 group by event.action order by cnt limit 15;"""
 
-db.execute('set threads to 3')
+db.execute('set threads to 2')
 
 if "view" not in sys.argv:
   db.execute('create table aws_cloudtrail as select * from "*.parquet"')

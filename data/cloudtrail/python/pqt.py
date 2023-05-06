@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 
 import polars as pl 
-import sys,psutil,humanize
+import sys,psutil,platform,humanize
+
+print ("Polars version:",pl.__version__)
+print ("Platform:",platform.machine(),platform.python_version())
+
+
 
 if "lazy" not in sys.argv:
   df = pl.read_parquet("*.parquet")
