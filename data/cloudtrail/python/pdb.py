@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
 import duckdb
-import sys,psutil,platform,humanize
+import sys,psutil,platform,humanize,cpuinfo
 
 print ("DuckDB Version",duckdb.__version__)
-print ("Platform:",platform.machine(),platform.python_version())
-
+print ("Platform:", cpuinfo.get_cpu_info()['brand_raw'] ,platform.python_version())
 
 db = duckdb.connect()
 
@@ -14,6 +13,10 @@ q['aws_svc_cnt'] = """select source.address, count(*) as cnt from aws_cloudtrail
                       where source.address like '%amazonaws.com' group by source.address order by cnt desc;"""
 q['infreq_events'] = """select event.action, count(*) as cnt from aws_cloudtrail 
 group by event.action order by cnt limit 15;"""
+
+
+q['freq_events'] = """select event.action, count(*) as cnt from aws_cloudtrail 
+group by event.action order by cnt desc limit 15;"""
 
 db.execute('set threads to 2')
 
