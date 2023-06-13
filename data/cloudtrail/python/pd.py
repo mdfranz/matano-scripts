@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
-import psutil,humanize,platform
+import psutil,humanize,platform,cpuinfo
 import pandas as pd
 from pathlib import Path                           
 
 print ("Pandas version:",pd.__version__)
 print ("Platform:",platform.machine(),platform.python_version())
+print ("CPU:", cpuinfo.get_cpu_info()['brand_raw'])
 
 data_dir=Path(".")                          
 df = pd.concat(                         

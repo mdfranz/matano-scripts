@@ -4,7 +4,8 @@ import duckdb
 import sys,psutil,platform,humanize,cpuinfo
 
 print ("DuckDB Version",duckdb.__version__)
-print ("Platform:", cpuinfo.get_cpu_info()['brand_raw'] ,platform.python_version())
+print ("Platform:",platform.machine(),platform.python_version())
+print ("CPU:", cpuinfo.get_cpu_info()['brand_raw'])
 
 db = duckdb.connect()
 

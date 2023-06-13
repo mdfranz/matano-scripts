@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 
 import polars as pl 
-import sys,psutil,platform,humanize
+import sys,psutil,platform,humanize,cpuinfo
 
 print ("Polars version:",pl.__version__)
 print ("Platform:",platform.machine(),platform.python_version())
+print ("CPU:", cpuinfo.get_cpu_info()['brand_raw'])
 
-if "lazy" not in sys.argv:
-  df = pl.read_parquet("*.parquet")
-else:
-  print("Lazy read")
-  lazy = pl.scan_parquet("*.parquet")
+df = pl.read_parquet("*.parquet")
 
 print ("\nAWS Service Count")
 aws_svc = df.filter( pl.col("source").struct["address"].str.contains("amazonaws.com") )
