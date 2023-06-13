@@ -16,13 +16,16 @@ print ("\nAWS Service Count")
 aws_svc = df.filter( pl.col("source").struct["address"].str.contains("amazonaws.com") )
 print('Records: ',len(aws_svc))
 
-print (aws_svc.select( pl.col("source").struct["address"].value_counts(sort=True)))
+for r in aws_svc.select( pl.col("source").struct["address"].value_counts(sort=True)).iter_rows():
+  print(r)
 
 print ("\nInfrequent Events")
-print (aws_svc.select( pl.col("event").struct["action"].value_counts(sort=True) ).tail(15) ) 
+for r in aws_svc.select( pl.col("event").struct["action"].value_counts(sort=True) ).tail(15).iter_rows():
+  print(r)
 
 print ("\nFrequent Events")
-print (aws_svc.select( pl.col("event").struct["action"].value_counts(sort=True) ).head(15) ) 
+for r in aws_svc.select( pl.col("event").struct["action"].value_counts(sort=True) ).head(15).iter_rows():
+  print(r)
 
 print( "Process Memory", humanize.filesize.naturalsize( psutil.Process().memory_info().rss ))
 print( "Virtual Memory", psutil.virtual_memory() )
