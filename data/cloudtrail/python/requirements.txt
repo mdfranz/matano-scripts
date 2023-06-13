@@ -1,0 +1,6 @@
+polars
+psutil
+duckdb
+pandas
+py-cpuinfo
+humanize
